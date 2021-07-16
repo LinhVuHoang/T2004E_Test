@@ -8,8 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using T2004E_Test.Context;
 using T2004E_Test.Models;
-using System.Dynamic;
-using System.IO;
+
 namespace T2004E_Test.Controllers
 {
     public class FacultyController : Controller

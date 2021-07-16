@@ -1,46 +1,85 @@
-﻿@model IEnumerable<T2004E_Test.Models.Exam>
+﻿@model dynamic
 
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/Admin_Layout.cshtml";
+
 }
 
 <h2>Index</h2>
-
+@{ Html.BeginForm("Index", "Exam", FormMethod.Get);}
+@Html.TextBox("search")
+<select name="classroomId" class="form-control">
+    <option value="">Select Classroom</option>
+    @foreach (T2004E_Test.Models.Classroom item in Model.Classrooms)
+    {
+        <option @(ViewBag.ClassroomId == item.Id ? "selected" : "") value="@item.Id">@item.Name</option>
+    }
+</select>
+<button type="submit">Search</button>
+@{ Html.EndForm();}
 <p>
     @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Sort by Name ASC", "Index", new { sortOrder = "asc" })
+    @Html.ActionLink("Sort by Name DESC", "Index", new { sortOrder = "desc" })
 </p>
+
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.StartTime)
+            Classroom
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ExamDate)
+            Faculty
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ExamDuration)
+            Name
+        </th>
+        <th>
+            Start time
+        </th>
+        <th>
+            Exam date
+        </th>
+        <th>
+            Exam duration (minutes)
+        </th>
+        <th>
+            Status
         </th>
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.StartTime)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ExamDate)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ExamDuration)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
-        </td>
-    </tr>
-}
+    @foreach (T2004E_Test.Models.Exam item in Model.Exams)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Classroom.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Faculty.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Start_time)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Exam_date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Exam_duration)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            </td>
+        </tr>
+    }
 
 </table>

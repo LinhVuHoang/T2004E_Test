@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
-using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using T2004E_Test.Context;
 using T2004E_Test.Models;
-using System.IO;
-
+using System.Dynamic;
 namespace T2004E_Test.Controllers
 {
     public class ExamController : Controller
@@ -18,47 +16,39 @@ namespace T2004E_Test.Controllers
         private DataContext db = new DataContext();
 
         // GET: Exam
-        public ActionResult Index(string subjectId,string classroomId,string facultiesId,string statusesId)
+        public ActionResult Index(string search, string sortOrder, string classroomId)
         {
-            ViewBag.SubjectID = 0;
-            var subjects = from p in db.Subjects select p;
-            if (!String.IsNullOrEmpty(subjectId))
+            ViewBag.ClassroomId = 0;
+            string sort = !String.IsNullOrEmpty(sortOrder) ? sortOrder : "asc";
+
+            var exams = from p in db.Exams select p;
+            if (!String.IsNullOrEmpty(search))
             {
-                var sjId = Convert.ToInt32(subjectId);
-                subjects = subjects.Where(p => p.SubjectID == sjId);
-                ViewBag.SubjectId = sjId;
+                exams = exams.Where(p => p.Name.Contains(search));
             }
-            ViewBag.ClassRoomID = 0;
-            var classrooms = from c in db.ClassRooms select c;
+            switch (sort)
+            {
+                case "asc": exams = exams.OrderBy(p => p.Name); break;
+                case "desc": exams = exams.OrderByDescending(p => p.Name); break;
+            }
+            // loc theo category
             if (!String.IsNullOrEmpty(classroomId))
             {
-                var clId = Convert.ToInt32(classrooms);
-                classrooms = classrooms.Where(p => p.ClassRoomID == clId);
-                ViewBag.ClassRoomId = clId;
+                var classId = Convert.ToInt32(classroomId);
+                exams = exams.Where(p => p.ClassroomID == classId);
+                ViewBag.ClassroomId = classId;
             }
-            ViewBag.FacultiesID = 0;
-            var faculties = from f in db.Faculties select f;
-            if (!String.IsNullOrEmpty(facultiesId))
-            {
-                var fId = Convert.ToInt32(facultiesId);
-                faculties =faculties.Where(p => p.FacultiesID == fId);
-                ViewBag.FacultyId = fId;
-            }
-            ViewBag.StatusID = 0;
-            var statuses = from s in db.Statuses select s;
-            if (!String.IsNullOrEmpty(statusesId))
-            {
-                var sId = Convert.ToInt32(statusesId);
-                statuses = statuses.Where(s=> s.StatusID == sId);
-                ViewBag.StatusId = sId;
-            }
-            var exams = db.Exams.ToList();
+
+
+            var classrooms = db.Classrooms.ToList();
+            var faculties = db.Faculties.ToList();
             dynamic data = new ExpandoObject();
             data.Exams = exams;
-            data.ClassRooms = classrooms;
-            data.Faculties = faculties;
-            data.Statuses = statuses;
+            data.Classrooms = classrooms;
+            data.Faculty = faculties;
             return View(data);
+            //var exams = db.Exams.Include(e => e.Classroom).Include(e => e.Faculty);
+            //return View(exams.ToList());
         }
 
         // GET: Exam/Details/5
@@ -79,6 +69,8 @@ namespace T2004E_Test.Controllers
         // GET: Exam/Create
         public ActionResult Create()
         {
+            ViewBag.ClassroomID = new SelectList(db.Classrooms, "Id", "Name");
+            ViewBag.FacultyID = new SelectList(db.Faculties, "Id", "Name");
             return View();
         }
 
@@ -87,15 +79,18 @@ namespace T2004E_Test.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,StartTime,ExamDate,ExamDuration")] Exam exam)
+        public ActionResult Create([Bind(Include = "Id,Name,Start_time,Exam_date,Exam_duration,Status,ClassroomID,FacultyID")] Exam exam)
         {
             if (ModelState.IsValid)
             {
+                exam.Start_time.ToString();
                 db.Exams.Add(exam);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
+            ViewBag.ClassroomID = new SelectList(db.Classrooms, "Id", "Name", exam.ClassroomID);
+            ViewBag.FacultyID = new SelectList(db.Faculties, "Id", "Name", exam.FacultyID);
             return View(exam);
         }
 
@@ -111,6 +106,10 @@ namespace T2004E_Test.Controllers
             {
                 return HttpNotFound();
             }
+
+            ViewBag.ClassroomID = new SelectList(db.Classrooms, "Id", "Name", exam.ClassroomID);
+            ViewBag.FacultyID = new SelectList(db.Faculties, "Id", "Name", exam.FacultyID);
+
             return View(exam);
         }
 
@@ -119,14 +118,17 @@ namespace T2004E_Test.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,StartTime,ExamDate,ExamDuration")] Exam exam)
+        public ActionResult Edit([Bind(Include = "Id,Name,Start_time,Exam_date,Exam_duration,Status,ClassroomID,FacultyID")] Exam exam)
         {
             if (ModelState.IsValid)
             {
+                exam.Start_time.ToString();
                 db.Entry(exam).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
+            ViewBag.ClassroomID = new SelectList(db.Classrooms, "Id", "Name", exam.ClassroomID);
+            ViewBag.FacultyID = new SelectList(db.Faculties, "Id", "Name", exam.FacultyID);
             return View(exam);
         }
 

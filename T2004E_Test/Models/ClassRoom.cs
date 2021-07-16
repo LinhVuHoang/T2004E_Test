@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
-
+using System.ComponentModel.DataAnnotations;
 namespace T2004E_Test.Models
 {
-    public class ClassRoom
+    public class Classroom
     {
-        [Key]
+
+        [Key] // khoa chinh
         public int Id { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Required")]
         public string Name { get; set; }
-        public int ClassRoomID { get; set; }
-        public virtual Exam Exam { get; set; }
+        public virtual ICollection<Exam> Exams { get; set; } // giong hasMany
     }
 }

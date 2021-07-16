@@ -1,23 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
-
+using System.ComponentModel.DataAnnotations;
 namespace T2004E_Test.Models
 {
     public class Exam
     {
-        [Key]
+        [Key] // khoa chinh
         public int Id { get; set; }
-        [Required(ErrorMessage = "Vui lòng nhập Giờ thi")]
-        public string StartTime { get; set; }
-        [Required(ErrorMessage = "Vui lòng nhập Ngày thi")]
-        public string ExamDate { get; set; }
-        [Required(ErrorMessage = "Vui lòng nhập Thời gian thi")]
-        public int ExamDuration { get; set; }
-        public virtual ICollection<ClassRoom> ClassRoom { get; set; }
-        public virtual ICollection<Faculty> Facultie { get; set; }
-        public virtual ICollection<Subject> Subject { get; set; }
+
+        [Required(ErrorMessage = "Required")]
+        public string Name { get; set; }
+        [Required(ErrorMessage = "Required")]
+        public string Start_time { get; set; }
+        [Required(ErrorMessage = "Required")]
+        public DateTime Exam_date { get; set; }
+        [Required(ErrorMessage = "Required")]
+        public double Exam_duration { get; set; }
+        [Required(ErrorMessage = "Required")]
+
+        public string Status { get; set; }
+        [Required(ErrorMessage = "Required")]
+
+        public int ClassroomID { get; set; } // khoa ngoai
+        public int FacultyID { get; set; }
+
+        public virtual Classroom Classroom { get; set; }
+        public virtual Faculty Faculty { get; set; }
     }
 }
